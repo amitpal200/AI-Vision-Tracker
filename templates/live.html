@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="fw-bold">Live Camera Detection</h1>
+      <p class="text-secondary-emphasis mb-0">Annotated webcam stream with bounding boxes, labels, confidence scores, and tracking IDs.</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-info" id="startLive">Start stream</button>
+      <button class="btn btn-outline-warning" id="captureShot">Screenshot</button>
+      <button class="btn btn-outline-danger" id="stopLive">Stop</button>
+    </div>
+  </div>
+  <div class="video-shell">
+    <img id="liveImage" alt="Live object detection stream" data-src="/api/live_feed">
+    <div class="stream-placeholder" id="livePlaceholder">Stream is paused</div>
+  </div>
+</section>
+{% endblock %}

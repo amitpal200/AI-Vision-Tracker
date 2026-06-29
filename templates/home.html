@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero-band">
+  <div class="container py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge text-bg-info mb-3">YOLOv8 + Deep SORT + Flask</span>
+        <h1 class="display-4 fw-bold">Real-Time Object Detection and Tracking System</h1>
+        <p class="lead text-secondary-emphasis mt-3">Detect COCO objects, preserve tracking IDs through motion and short occlusions, stream webcam results, process uploaded videos, and explain every result with analytics.</p>
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <a class="btn btn-info btn-lg" href="{{ url_for('pages.live_camera') }}">Start live detection</a>
+          <a class="btn btn-outline-light btn-lg" href="{{ url_for('pages.upload') }}">Upload video</a>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="vision-panel">
+          <div class="scan-line"></div>
+          <div class="det-box box-a">person 0.91 | ID 7</div>
+          <div class="det-box box-b">car 0.87 | ID 12</div>
+          <div class="det-box box-c">bottle 0.76 | ID 4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-md-4"><div class="feature-card"><h3>Multi-source input</h3><p>Run inference on live webcam streams or uploaded MP4, AVI, and MOV files.</p></div></div>
+    <div class="col-md-4"><div class="feature-card"><h3>Tracking identity</h3><p>Deep SORT combines motion and appearance cues so moving objects keep stable IDs.</p></div></div>
+    <div class="col-md-4"><div class="feature-card"><h3>Portfolio analytics</h3><p>Chart class counts, FPS, frame time, confidence, and stored detection history.</p></div></div>
+  </div>
+</section>
+{% endblock %}

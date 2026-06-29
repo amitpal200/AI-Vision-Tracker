@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <h1 class="fw-bold">Analytics Dashboard</h1>
+  <div class="row g-3 mt-2">
+    <div class="col-md-3"><div class="metric"><span>Total objects</span><strong id="metricTotal">0</strong></div></div>
+    <div class="col-md-3"><div class="metric"><span>FPS</span><strong id="metricFps">0</strong></div></div>
+    <div class="col-md-3"><div class="metric"><span>Frame time</span><strong id="metricTime">0 ms</strong></div></div>
+    <div class="col-md-3"><div class="metric"><span>Accuracy</span><strong id="metricAccuracy">0%</strong></div></div>
+  </div>
+  <div class="row g-4 mt-2">
+    <div class="col-lg-7"><div class="chart-panel"><canvas id="classChart"></canvas></div></div>
+    <div class="col-lg-5"><div class="chart-panel"><canvas id="systemChart"></canvas></div></div>
+  </div>
+</section>
+{% endblock %}

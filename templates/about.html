@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <h1 class="fw-bold">About the Project</h1>
+  <p class="lead text-secondary-emphasis">This system captures frames with OpenCV, runs YOLOv8 object detection, passes detections into Deep SORT, overlays labels and IDs, and stores every event in SQLite for dashboards and exports.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="info-panel">
+        <h2>Pipeline</h2>
+        <ol>
+          <li>OpenCV reads a webcam frame or uploaded video frame.</li>
+          <li>YOLOv8 predicts COCO class boxes and confidence scores.</li>
+          <li>Deep SORT associates detections across frames using motion and appearance.</li>
+          <li>Annotated frames stream to the browser or are written to processed video.</li>
+          <li>SQLite stores timestamped class names, confidence, IDs, boxes, and filenames.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="info-panel">
+        <h2>Error Handling</h2>
+        <p>Missing model weights, camera access failures, unsupported uploads, unreadable videos, and low-memory conditions are returned as clear UI/API errors.</p>
+        <p>The app selects CUDA automatically when PyTorch detects a compatible GPU, otherwise it uses CPU.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <h1 class="fw-bold">Detection Results</h1>
+      <p class="text-secondary-emphasis mb-0">Processed videos, CSV exports, and recent detection rows.</p>
+    </div>
+    <a class="btn btn-outline-info" href="/api/export/csv">Export CSV logs</a>
+  </div>
+
+  <div class="table-responsive mt-4">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Source file</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>FPS</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody id="jobsTable">
+        <tr><td colspan="6" class="text-secondary">Loading upload jobs...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="h4 fw-bold mt-5">Detection History</h2>
+  <div class="table-responsive mt-4">
+    <table class="table table-hover align-middle">
+      <thead><tr><th>Time</th><th>Source</th><th>File</th><th>Class</th><th>Confidence</th><th>Track ID</th></tr></thead>
+      <tbody id="historyTable">
+        <tr><td colspan="6" class="text-secondary">Loading detection history...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <h1 class="fw-bold">Contact</h1>
+  <p class="lead text-secondary-emphasis">Use this page in your portfolio to add your name, email, LinkedIn, GitHub, and internship availability.</p>
+  <div class="info-panel mt-4">
+    <form>
+      <div class="row g-3">
+        <div class="col-md-6"><input class="form-control" placeholder="Your name"></div>
+        <div class="col-md-6"><input class="form-control" placeholder="Email address"></div>
+        <div class="col-12"><textarea class="form-control" rows="5" placeholder="Message"></textarea></div>
+      </div>
+      <button class="btn btn-info mt-3" type="button">Save as portfolio contact form</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
