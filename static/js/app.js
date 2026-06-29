@@ -199,10 +199,10 @@ async function loadDashboard() {
   if (!document.getElementById("classChart")) return;
   const response = await fetch("/api/analytics");
   const data = await response.json();
-  document.getElementById("metricTotal").textContent = data.total_detected_objects || 0;
-  document.getElementById("metricFps").textContent = data.fps || 0;
-  document.getElementById("metricTime").textContent = `${data.processing_time_ms || 0} ms`;
-  document.getElementById("metricAccuracy").textContent = `${data.overall_detection_accuracy || 0}%`;
+  document.getElementById("metricTotal").textContent = formatCompactNumber(data.total_detected_objects || 0);
+  document.getElementById("metricFps").textContent = formatMetricNumber(data.fps || 0);
+  document.getElementById("metricTime").textContent = `${formatMetricNumber(data.processing_time_ms || 0)} ms`;
+  document.getElementById("metricAccuracy").textContent = `${formatMetricNumber(data.overall_detection_accuracy || 0)}%`;
 
   const labels = Object.keys(data.class_counts || {});
   const values = Object.values(data.class_counts || {});
@@ -226,6 +226,19 @@ async function loadDashboard() {
     systemChart.data.datasets[0].data = [data.active_tracked_objects || 0, data.fps || 0];
     systemChart.update();
   }
+}
+
+function formatMetricNumber(value) {
+  const number = Number(value) || 0;
+  if (number >= 1000) return Math.round(number).toLocaleString();
+  if (number >= 100) return number.toFixed(0);
+  if (number >= 10) return number.toFixed(1);
+  return number.toFixed(2).replace(/\.?0+$/, "");
+}
+
+function formatCompactNumber(value) {
+  const number = Number(value) || 0;
+  return number >= 10000 ? number.toLocaleString() : String(number);
 }
 
 document.getElementById("clearDashboard")?.addEventListener("click", async () => {
