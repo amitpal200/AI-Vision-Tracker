@@ -9,7 +9,15 @@ from app.config import Config
 from app.services.camera import CameraStream
 from app.services.detector import DetectionService, ModelLoadError
 from app.services.video_processor import VideoProcessor
-from app.utils.database import create_job, export_history_csv, get_analytics, get_history, get_job, get_jobs
+from app.utils.database import (
+    clear_detection_history,
+    create_job,
+    export_history_csv,
+    get_analytics,
+    get_history,
+    get_job,
+    get_jobs,
+)
 from app.utils.files import allowed_file, unique_filename
 
 
@@ -127,6 +135,22 @@ def analytics():
             }
         )
     return jsonify(data)
+
+
+@api_bp.post("/analytics/clear")
+def clear_analytics():
+    """Clear detection history used by the dashboard and history table."""
+    removed = clear_detection_history(Config.DATABASE_PATH)
+    if detector:
+        detector.stats.update(
+            {
+                "total_detected_objects": 0,
+                "class_counts": {},
+                "active_tracked_objects": 0,
+                "overall_detection_accuracy": 0.0,
+            }
+        )
+    return jsonify({"message": "Dashboard data cleared", "removed": removed})
 
 
 @api_bp.get("/history")

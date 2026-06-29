@@ -1,18 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="container py-5">
-  <h1 class="fw-bold">Upload Video</h1>
-  <p class="text-secondary-emphasis">Choose an MP4, AVI, or MOV file. Processing runs in the background so the web interface stays responsive.</p>
-  <form id="uploadForm" class="upload-panel mt-4">
-    <label for="videoFile" class="form-label">Video file</label>
-    <input class="form-control form-control-lg" type="file" id="videoFile" name="video" accept=".mp4,.avi,.mov" required>
-    <button class="btn btn-info btn-lg mt-3" type="submit">Upload and process</button>
-  </form>
-  <div class="mt-4">
-    <div class="progress" role="progressbar">
-      <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgress" style="width: 0%">0%</div>
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-5">
+      <h1 class="fw-bold">Upload Video</h1>
+      <p class="text-secondary-emphasis">Choose an MP4, AVI, or MOV file. Processing runs in the background and the processed output appears on the Results page.</p>
+      <div class="upload-tips mt-4">
+        <div><strong>Supported</strong><span>MP4, AVI, MOV</span></div>
+        <div><strong>Max size</strong><span>1 GB</span></div>
+        <div><strong>Output</strong><span>Annotated MP4 with tracking IDs</span></div>
+      </div>
     </div>
-    <p class="mt-3" id="uploadStatus">No active job.</p>
+    <div class="col-lg-7">
+      <form id="uploadForm" class="upload-panel">
+        <label for="videoFile" class="form-label">Video file</label>
+        <input class="form-control form-control-lg" type="file" id="videoFile" name="video" accept=".mp4,.avi,.mov" required>
+        <div class="file-summary mt-3" id="fileSummary">No file selected.</div>
+        <button class="btn btn-info btn-lg mt-3" id="uploadButton" type="submit">Upload and process</button>
+      </form>
+      <div class="mt-4">
+        <div class="progress" role="progressbar" aria-label="Upload processing progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgress" style="width: 0%">0%</div>
+        </div>
+        <p class="mt-3 mb-0" id="uploadStatus">No active job.</p>
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}

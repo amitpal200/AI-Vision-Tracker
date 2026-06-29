@@ -183,6 +183,13 @@ def get_analytics(db_path: Path) -> dict:
     }
 
 
+def clear_detection_history(db_path: Path) -> int:
+    """Delete dashboard detection rows and return how many were removed."""
+    with connect(db_path) as connection:
+        cursor = connection.execute("DELETE FROM detection_events")
+        return int(cursor.rowcount)
+
+
 def export_history_csv(db_path: Path, output_path: Path) -> Path:
     """Write the detection history to a CSV file and return the generated path."""
     rows = get_history(db_path, limit=100000)

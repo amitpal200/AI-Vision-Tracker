@@ -2,6 +2,7 @@ const toastElement = document.getElementById("appToast");
 const toastText = document.getElementById("toastText");
 const appToast = toastElement ? new bootstrap.Toast(toastElement) : null;
 const themeToggle = document.getElementById("themeToggle");
+const allowedVideoExtensions = ["mp4", "avi", "mov"];
 
 function notify(message) {
   if (!appToast) return;
@@ -50,35 +51,91 @@ document.getElementById("captureShot")?.addEventListener("click", async () => {
 });
 
 const uploadForm = document.getElementById("uploadForm");
-uploadForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const formData = new FormData(uploadForm);
-  const response = await fetch("/api/upload", { method: "POST", body: formData });
-  const data = await response.json();
-  if (!response.ok) {
-    notify(data.error || "Upload failed");
+const videoFile = document.getElementById("videoFile");
+const fileSummary = document.getElementById("fileSummary");
+const uploadButton = document.getElementById("uploadButton");
+
+videoFile?.addEventListener("change", () => {
+  const file = videoFile.files[0];
+  if (!fileSummary) return;
+  if (!file) {
+    fileSummary.textContent = "No file selected.";
+    fileSummary.classList.remove("text-danger");
     return;
   }
-  notify("Upload accepted");
-  pollJob(data.job_id);
+  const extension = file.name.split(".").pop().toLowerCase();
+  const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+  fileSummary.textContent = `${file.name} | ${sizeMb} MB`;
+  fileSummary.classList.toggle("text-danger", !allowedVideoExtensions.includes(extension));
+});
+
+uploadForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const file = videoFile?.files[0];
+  if (!file) {
+    notify("Choose a video before uploading");
+    return;
+  }
+  const extension = file.name.split(".").pop().toLowerCase();
+  if (!allowedVideoExtensions.includes(extension)) {
+    notify("Unsupported format. Upload MP4, AVI, or MOV.");
+    return;
+  }
+  const formData = new FormData(uploadForm);
+  setUploadState(0, "Uploading video...", true);
+  try {
+    const response = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await response.json();
+    if (!response.ok) {
+      setUploadState(0, data.error || "Upload failed", false);
+      notify(data.error || "Upload failed");
+      return;
+    }
+    notify("Upload accepted");
+    setUploadState(1, `Queued job #${data.job_id}`, true);
+    pollJob(data.job_id);
+  } catch (_error) {
+    setUploadState(0, "Upload failed. Check the server and try again.", false);
+    notify("Upload failed. Check the server.");
+  }
 });
 
 async function pollJob(jobId) {
-  const progress = document.getElementById("uploadProgress");
-  const status = document.getElementById("uploadStatus");
   const timer = setInterval(async () => {
-    const response = await fetch(`/api/jobs/${jobId}`);
-    const job = await response.json();
-    progress.style.width = `${job.progress || 0}%`;
-    progress.textContent = `${job.progress || 0}%`;
-    status.textContent = `${job.status}: ${job.message || ""}`;
-    if (job.status === "completed" || job.status === "failed") {
-      clearInterval(timer);
-      if (job.status === "completed" && job.output_file) {
-        status.innerHTML = `Completed. <a href="/api/download/${job.output_file}">Download processed video</a>`;
+    try {
+      const response = await fetch(`/api/jobs/${jobId}`);
+      const job = await response.json();
+      const percent = Number(job.progress || 0);
+      setUploadState(percent, `${job.status}: ${job.message || ""}`, true);
+      if (job.status === "completed" || job.status === "failed") {
+        clearInterval(timer);
+        setUploadState(job.status === "completed" ? 100 : percent, `${job.status}: ${job.message || ""}`, false);
+        if (job.status === "completed" && job.output_file) {
+          document.getElementById("uploadStatus").innerHTML = `Completed. <a href="/api/download/${job.output_file}">Download processed video</a>`;
+        }
       }
+    } catch (_error) {
+      clearInterval(timer);
+      setUploadState(0, "Could not read job status. Check the server.", false);
     }
   }, 1200);
+}
+
+function setUploadState(percent, message, isBusy) {
+  const progress = document.getElementById("uploadProgress");
+  const status = document.getElementById("uploadStatus");
+  const progressShell = progress?.parentElement;
+  const cleanPercent = Math.max(0, Math.min(100, Number(percent) || 0));
+  if (progress) {
+    progress.style.width = `${cleanPercent}%`;
+    progress.textContent = `${cleanPercent}%`;
+  }
+  progressShell?.setAttribute("aria-valuenow", String(cleanPercent));
+  if (status) status.textContent = message;
+  if (uploadButton) {
+    uploadButton.disabled = isBusy;
+    uploadButton.textContent = isBusy ? "Processing..." : "Upload and process";
+  }
 }
 
 async function loadHistory() {
@@ -149,11 +206,13 @@ async function loadDashboard() {
 
   const labels = Object.keys(data.class_counts || {});
   const values = Object.values(data.class_counts || {});
+  const chartLabels = labels.length ? labels : ["No data"];
+  const chartValues = values.length ? values : [0];
   if (!classChart) {
     classChart = new Chart(document.getElementById("classChart"), {
       type: "bar",
-      data: { labels, datasets: [{ label: "Objects by class", data: values, backgroundColor: "#31d2f2" }] },
-      options: { responsive: true, maintainAspectRatio: false }
+      data: { labels: chartLabels, datasets: [{ label: "Objects by class", data: chartValues, backgroundColor: "#31d2f2" }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
     systemChart = new Chart(document.getElementById("systemChart"), {
       type: "doughnut",
@@ -161,13 +220,23 @@ async function loadDashboard() {
       options: { responsive: true, maintainAspectRatio: false }
     });
   } else {
-    classChart.data.labels = labels;
-    classChart.data.datasets[0].data = values;
+    classChart.data.labels = chartLabels;
+    classChart.data.datasets[0].data = chartValues;
     classChart.update();
     systemChart.data.datasets[0].data = [data.active_tracked_objects || 0, data.fps || 0];
     systemChart.update();
   }
 }
+
+document.getElementById("clearDashboard")?.addEventListener("click", async () => {
+  const confirmed = window.confirm("Clear dashboard detection history?");
+  if (!confirmed) return;
+  const response = await fetch("/api/analytics/clear", { method: "POST" });
+  const data = await response.json();
+  notify(data.message || "Dashboard cleared");
+  loadDashboard();
+  loadHistory();
+});
 
 loadHistory();
 loadJobs();
