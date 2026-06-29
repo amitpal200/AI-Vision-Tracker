@@ -74,7 +74,6 @@ body {
 .upload-tips,
 .metric,
 .chart-panel {
-  height: 100%;
   padding: 1.25rem;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -130,6 +129,7 @@ body {
 }
 
 .feature-card {
+  height: 100%;
   transform: translateY(0);
   transition: transform 180ms ease, border-color 180ms ease;
 }
@@ -192,6 +192,7 @@ body {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
   gap: 1.5rem;
   margin-top: 1.5rem;
+  align-items: start;
 }
 
 .metric span {
@@ -209,14 +210,25 @@ body {
 }
 
 .chart-panel {
+  display: flex;
+  flex-direction: column;
   position: relative;
-  min-height: 360px;
+  height: clamp(320px, 42vh, 430px);
   min-width: 0;
   overflow: hidden;
 }
 
-.chart-panel canvas {
-  max-width: 100%;
+.chart-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.chart-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .panel-title {
