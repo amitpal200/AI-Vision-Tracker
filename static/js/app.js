@@ -1,6 +1,7 @@
 const toastElement = document.getElementById("appToast");
 const toastText = document.getElementById("toastText");
 const appToast = toastElement ? new bootstrap.Toast(toastElement) : null;
+const themeToggle = document.getElementById("themeToggle");
 
 function notify(message) {
   if (!appToast) return;
@@ -8,9 +9,20 @@ function notify(message) {
   appToast.show();
 }
 
-document.getElementById("themeToggle")?.addEventListener("click", () => {
+function updateThemeButton() {
+  if (!themeToggle) return;
+  const currentTheme = document.documentElement.dataset.bsTheme || "dark";
+  themeToggle.textContent = currentTheme === "dark" ? "Light mode" : "Dark mode";
+}
+
+updateThemeButton();
+
+themeToggle?.addEventListener("click", () => {
   const root = document.documentElement;
-  root.dataset.bsTheme = root.dataset.bsTheme === "dark" ? "light" : "dark";
+  const nextTheme = root.dataset.bsTheme === "dark" ? "light" : "dark";
+  root.dataset.bsTheme = nextTheme;
+  localStorage.setItem("theme", nextTheme);
+  updateThemeButton();
 });
 
 const liveImage = document.getElementById("liveImage");
